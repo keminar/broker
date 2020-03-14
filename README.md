@@ -4,7 +4,7 @@
 ===
 你是不是有过这种情况，从redis或是kafka或mysql读取到数据太多，一个脚本消费慢到赶不上数据产生的速度。或许你
 
-会说redis 是原子性的，可以多开几个脚本。但是如果日志源不是redis而是其它呢？比如mysql。
+会说redis 是原子性的，可以多开几个脚本，但是不够优雅。而且如果日志源不是redis而是其它呢？比如mysql。
 
 或许你依然可以举很多可行性方案。但是这个脚本只是提供另一种可行性。一个脚本（生产者）串行从（redis、mysql、
 
@@ -16,15 +16,17 @@ make all
 
 用法
 ===
-$ ./broker --help
+$ ./broker -h
 用法: broker --producer=[FILE] --consumer=[FILE] [OPTION]
 并发起多个消费者进程消费生产者的日志.
+--step * --fork-consumers 不要超过日志总条数, 否则效率反而会低.
 
     -p  --producer=TARGET       日志生产者，标准输入为stdin
     -c, --consumer=TARGET       日志消费者
-    -f, --fork-consumers=NUM    最大并发消费者数, 默认 1
-        --help                  显示当前的帮助信息
-        --version               显示版本信息并且退出
+    -f, --fork-consumers=NUM    最大并发消费者数, 默认 1, 最大50
+    -s, --step=NUM              每一个进程连续写几条日志, 范围[1-100]
+    -h, --help                  显示当前的帮助信息
+    -v, --version               显示版本信息并且退出
 
 示例
 ===
@@ -79,4 +81,19 @@ test6 12418 7 19:18:35
 test7 12418 8 19:18:36
 test8 12418 9 19:18:37
 test9 12418 10 19:18:38
+```
+
+指定步长
+```
+$ php ./example/a.php |./broker -p stdin -c ./example/b.php -s 5 -f 2
+test0 15481 1 20:58:39
+test5 15482 1 20:58:39
+test1 15481 2 20:58:40
+test6 15482 2 20:58:40
+test2 15481 3 20:58:41
+test7 15482 3 20:58:41
+test3 15481 4 20:58:42
+test8 15482 4 20:58:42
+test4 15481 5 20:58:43
+test9 15482 5 20:58:43
 ```
