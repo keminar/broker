@@ -4,6 +4,7 @@
 #include <limits.h>
 #include <error.h>
 #include <errno.h>
+#include <string.h>
 
 // 一行最大字节
 #define MAXLINE 65535
@@ -70,10 +71,14 @@ int main(int argc, char *argv[])
 		usage_zh(EXIT_FAILURE);
 	}
 
-	// 调起生产程序
-    if ((fpin = popen(producer, "r")) == NULL) {
-        perror("popen producer err");
-        return 0;
+    if (strcmp(producer, "stdin") != 0) {
+        // 调起生产程序
+        if ((fpin = popen(producer, "r")) == NULL) {
+            perror("popen producer err");
+            return 0;
+        }
+    } else {
+        fpin = stdin;
     }
 
 	// 调用多个消费者
@@ -97,10 +102,12 @@ int main(int argc, char *argv[])
         i++;
     }
 	// 关闭
-    if (pclose(fpin)) {
-		if (errno == 0) {
-        	perror("pclose fgets err");
-		}
+    if (strcmp(producer, "stdin") != 0) {
+        if (pclose(fpin)) {
+            if (errno == 0) {
+                perror("pclose fgets err");
+            }
+        }
     }
 	for (i=0; i< forks; i++) {
 		if (pclose(fpout[i])) {
@@ -181,7 +188,7 @@ void usage_zh(int status)
 "),
               stdout);
         fputs(_("\
-    -p  --producer=TARGET       日志生产者\n\
+    -p  --producer=TARGET       日志生产者，标准输入为stdin\n\
     -c, --consumer=TARGET       日志消费者\n\
     -f, --fork-consumers=NUM    最大并发消费者数, 默认 1\n\
         --help                  显示当前的帮助信息\n\

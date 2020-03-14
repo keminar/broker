@@ -20,7 +20,7 @@ $ ./broker --help
 用法: broker --producer=[FILE] --consumer=[FILE] [OPTION]
 并发起多个消费者进程消费生产者的日志.
 
-    -p  --producer=TARGET       日志生产者
+    -p  --producer=TARGET       日志生产者，标准输入为stdin
     -c, --consumer=TARGET       日志消费者
     -f, --fork-consumers=NUM    最大并发消费者数, 默认 1
         --help                  显示当前的帮助信息
@@ -64,4 +64,20 @@ test8 11552 1 18:37:56
 real    0m2.249s
 user    0m0.109s
 sys     0m1.297s
+```
+
+支持管道输入
+===
+```
+$ php ./example/a.php |./broker -p stdin -c ./example/b.php 
+test0 12418 1 19:18:29
+test1 12418 2 19:18:30
+test2 12418 3 19:18:31
+test3 12418 4 19:18:32
+test4 12418 5 19:18:33
+test5 12418 6 19:18:34
+test6 12418 7 19:18:35
+test7 12418 8 19:18:36
+test8 12418 9 19:18:37
+test9 12418 10 19:18:38
 ```
