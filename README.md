@@ -67,7 +67,6 @@ sys     0m1.297s
 ```
 
 支持管道输入
-===
 ```
 $ php ./example/a.php |./broker -p stdin -c ./example/b.php 
 test0 12418 1 19:18:29
