@@ -60,11 +60,9 @@ int main(int argc, char *argv[])
     int i, j, z;
 	forks = 1;
     step = 1;
+    producer = "stdin";
 
 	decode_switches(argc, argv);
-	if (producer == NULL) {
-		usage_zh(EXIT_FAILURE);
-	}
 	if (consumer == NULL) {
 		usage_zh(EXIT_FAILURE);
 	}
@@ -213,7 +211,7 @@ void usage_zh(int status)
 "),
               stdout);
         fputs(_("\
-    -p  --producer=TARGET       日志生产者，标准输入为stdin\n\
+    -p  --producer=TARGET       日志生产者，标准输入为stdin, 默认值\n\
     -c, --consumer=TARGET       日志消费者\n\
     -f, --fork-consumers=NUM    最大并发消费者数, 默认 1, 最大50\n\
     -s, --step=NUM              每一个进程连续写几条日志, 默认 1, 最大100\n\
