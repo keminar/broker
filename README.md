@@ -17,16 +17,19 @@ make all
 用法
 ===
 $ ./broker -h
+```
 用法: broker --producer=[FILE] --consumer=[FILE] [OPTION]
-并发起多个消费者进程消费生产者的日志.
+并发多个消费者进程消费生产者的日志, 支持管道输入.
+
 --step * --fork-consumers 不要超过日志总条数, 否则效率反而会低.
 
-    -p  --producer=TARGET       日志生产者，标准输入为stdin, 默认值
+    -p  --producer=TARGET       日志生产者，标准输入为stdin (默认)
     -c, --consumer=TARGET       日志消费者
     -f, --fork-consumers=NUM    最大并发消费者数, 默认 1, 最大50
-    -s, --step=NUM              每一个进程连续写几条日志, 范围[1-100]
+    -s, --step=NUM              每一个进程连续写几条日志, 默认 1, 最大100
     -h, --help                  显示当前的帮助信息
     -v, --version               显示版本信息并且退出
+```
 
 示例
 ===

@@ -205,13 +205,14 @@ void usage_zh(int status)
     else
     {
         printf(_("用法: %s --producer=[FILE] --consumer=[FILE] [OPTION]\n"), PACKAGE_NAME);
-        fputs(_("并发起多个消费者进程消费生产者的日志.\n\
+        fputs(_("并发多个消费者进程消费生产者的日志, 支持管道输入.\n\
+\n\
 --step * --fork-consumers 不要超过日志总条数, 否则效率反而会低.\n\
 \n\
 "),
               stdout);
         fputs(_("\
-    -p  --producer=TARGET       日志生产者，标准输入为stdin, 默认值\n\
+    -p  --producer=TARGET       日志生产者，标准输入为stdin (默认)\n\
     -c, --consumer=TARGET       日志消费者\n\
     -f, --fork-consumers=NUM    最大并发消费者数, 默认 1, 最大50\n\
     -s, --step=NUM              每一个进程连续写几条日志, 默认 1, 最大100\n\
