@@ -48,8 +48,8 @@ static struct option const long_options[] =
         {"consumer", required_argument, NULL, 'c'},
         {"fork-consumers", required_argument, NULL, 'f'},
         {"step", required_argument, NULL, 's'},
-        {"help", required_argument, NULL, 'h'},
-        {"version", required_argument, NULL, 'v'},
+        {"help", no_argument, NULL, 'h'},
+        {"version", no_argument, NULL, 'v'},
         {NULL, 0, NULL, 0}
 };
 
