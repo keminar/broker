@@ -26,7 +26,7 @@
 // 生产者
 static char *producer;
 
-// 消费才
+// 消费者
 static char *consumer;
 
 // 并发数
