@@ -3,15 +3,11 @@
 
 普通计算
 ===
-php example/input.php |php example/calc_usleep.php
-
-并发数为1
-===
-php example/input.php |./broker -c 'php example/plus_usleep.php' -f 1|php example/calc.php
+php example/input.php |php example/one_usleep.php
 
 并发数为10
 ===
-php example/input.php |./broker -c 'php example/plus_usleep.php' -f 10|php example/calc.php
+php example/input.php |./broker -c 'php example/plus_usleep.php' -f 10 |php example/join.php
 
 终端二
 ==
