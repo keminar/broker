@@ -100,3 +100,7 @@ test8 15482 4 20:58:42
 test4 15481 5 20:58:43
 test9 15482 5 20:58:43
 ```
+
+更多
+===
+[流式调用某函数10万次](https://github.com/keminar/broker/tree/master/example)
