@@ -7,13 +7,13 @@
 #include <string.h>
 
 // 一行最大字节
-#define MAXLINE 65535
+#define MAX_LINE 65535
 
 // 最大并发数
-#define MAXFORK 50
+#define MAX_FORK 50
 
 // 最大步长
-#define MAXSTEP 100
+#define MAX_STEP 100
 
 // 应用名
 #define PACKAGE_NAME "broker"
@@ -55,8 +55,8 @@ static struct option const long_options[] =
 
 int main(int argc, char *argv[])
 {
-    char line[MAXLINE];
-    FILE *fpin, *fpout[MAXFORK];
+    char line[MAX_LINE];
+    FILE *fpin, *fpout[MAX_FORK];
     int i, j, z;
 	forks = 1;
     step = 1;
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 
 	// 转发日志
     i = j =0;
-    while (fgets(line, MAXLINE, fpin) != NULL) {
+    while (fgets(line, MAX_LINE, fpin) != NULL) {
         // 计算进程号
 		z = j % forks;
         if (fputs(line, fpout[z]) == EOF) {
@@ -162,8 +162,8 @@ static int decode_switches(int argc, char **argv)
         case 'f':
         {
             forks = atoi(optarg);
-			if (forks <= 0 || forks > MAXFORK) {
-				error(EXIT_FAILURE, 0, _("invalid --fork-consumers: %s range[1-%d]"),  optarg, MAXFORK);
+			if (forks <= 0 || forks > MAX_FORK) {
+				error(EXIT_FAILURE, 0, _("invalid --fork-consumers: %s range[1-%d]"),  optarg, MAX_FORK);
 			}
             break;
         }
@@ -175,8 +175,8 @@ static int decode_switches(int argc, char **argv)
         case 's':
         {
             step = atoi(optarg);
-			if (step <= 0 || step > MAXSTEP) {
-				error(EXIT_FAILURE, 0, _("invalid --step: %s range[1-%d]"),  optarg, MAXSTEP);
+			if (step <= 0 || step > MAX_STEP) {
+				error(EXIT_FAILURE, 0, _("invalid --step: %s range[1-%d]"),  optarg, MAX_STEP);
 			}
             break;
         }
