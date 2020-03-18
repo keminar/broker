@@ -42,8 +42,7 @@ static int increment(int val);
 //帮助
 void usage_zh(int status);
 
-static struct option const long_options[] =
-{
+static struct option const long_options[] = {
         {"producer", required_argument, NULL, 'p'},
         {"consumer", required_argument, NULL, 'c'},
         {"fork-consumers", required_argument, NULL, 'f'},
@@ -53,8 +52,7 @@ static struct option const long_options[] =
         {NULL, 0, NULL, 0}
 };
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     char line[MAX_LINE];
     FILE *fpin, *fpout[MAX_FORK];
     int i, j, z;
@@ -121,8 +119,7 @@ int main(int argc, char *argv[])
 }
 
 // 安全的递增
-static int increment(int val)
-{
+static int increment(int val) {
     if (val >= INT_MAX) {
         // 重置下，防止日志多时溢出
         val = 0;
@@ -133,10 +130,8 @@ static int increment(int val)
 }
 
 // 解析参数
-static int decode_switches(int argc, char **argv)
-{
-    for (;;)
-    {
+static int decode_switches(int argc, char **argv) {
+    for (;;) {
         int oi = -1;
         //形式如 a:b::cd: ，分别表示程序支持的命令行短选项有-a、-b、-c、-d，冒号含义如下：
         //(1)只有一个字符，不带冒号——只表示选项， 如-c 
@@ -196,14 +191,10 @@ static int decode_switches(int argc, char **argv)
 }
 
 // 中文
-void usage_zh(int status)
-{
-    if (status != EXIT_SUCCESS)
-    {
+void usage_zh(int status) {
+    if (status != EXIT_SUCCESS) {
         fprintf(stderr, _("Try '%s --help' for more information\n"), PACKAGE_NAME);
-    }
-    else
-    {
+    } else {
         printf(_("用法: %s --producer=[FILE] --consumer=[FILE] [OPTION]\n"), PACKAGE_NAME);
         fputs(_("并发多个消费者进程消费生产者的日志, 支持管道输入.\n\
 \n\
