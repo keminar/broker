@@ -19,7 +19,7 @@
 #define PACKAGE_NAME "broker"
 
 // 版本
-#define PACKAGE_VERSION "v0.1"
+#define PACKAGE_VERSION "v0.0.1"
 
 #define _(Msgid) ((const char*)Msgid)
 
