@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <limits.h>
-#include <error.h>
 #include <errno.h>
 #include <string.h>
 
@@ -19,9 +18,21 @@
 #define PACKAGE_NAME "broker"
 
 // 版本
-#define PACKAGE_VERSION "v0.1"
+#define PACKAGE_VERSION "v0.2"
 
 #define _(Msgid) ((const char*)Msgid)
+
+// 解决Alpine Linux没有error.h的问题
+#define error(exit_status, errnum, format, ...) \
+    do { \
+        fprintf(stderr, format, ##__VA_ARGS__); \
+        if (errnum != 0) \
+            fprintf(stderr, ": %s", strerror(errnum)); \
+        fprintf(stderr, "\n"); \
+        if (exit_status != 0) \
+            exit(exit_status); \
+    } while (0)
+
 
 // 生产者
 static char *producer;
@@ -58,14 +69,14 @@ int main(int argc, char *argv[])
     char line[MAXLINE];
     FILE *fpin, *fpout[MAXFORK];
     int i, j, z;
-	forks = 1;
+    forks = 1;
     step = 1;
     producer = "stdin";
 
-	decode_switches(argc, argv);
-	if (consumer == NULL) {
-		usage_zh(EXIT_FAILURE);
-	}
+    decode_switches(argc, argv);
+    if (consumer == NULL) {
+        usage_zh(EXIT_FAILURE);
+    }
 
     if (strcmp(producer, "stdin") != 0) {
         // 调起生产程序
@@ -77,23 +88,23 @@ int main(int argc, char *argv[])
         fpin = stdin;
     }
 
-	// 调用多个消费者
-	for (i=0; i< forks; i++) {
-		if ((fpout[i] = popen(consumer, "w")) == NULL) {
-			perror("popen consumer err");
-			return 0;
-		}
-	}
+    // 调用多个消费者
+    for (i=0; i< forks; i++) {
+        if ((fpout[i] = popen(consumer, "w")) == NULL) {
+            perror("popen consumer err");
+            return 0;
+        }
+    }
 
-	// 转发日志
+    // 转发日志
     i = j =0;
     while (fgets(line, MAXLINE, fpin) != NULL) {
         // 计算进程号
-		z = j % forks;
+        z = j % forks;
         if (fputs(line, fpout[z]) == EOF) {
-			perror("fputs to consumer err");
-			return 0;
-		}
+            perror("fputs to consumer err");
+            return 0;
+        }
         // 特别重要，不然就不是并发了，默认要达到一定量或是pclose时才会真的发送
         fflush(fpout[z]);
         // 先位移一小步
@@ -111,13 +122,13 @@ int main(int argc, char *argv[])
             }
         }
     }
-	for (i=0; i< forks; i++) {
-		if (pclose(fpout[i])) {
-			if (errno == 0) {
-				perror("pclose forks err");
-			}
-		}
-	}
+    for (i=0; i< forks; i++) {
+        if (pclose(fpout[i])) {
+            if (errno == 0) {
+                perror("pclose forks err");
+            }
+        }
+    }
 }
 
 // 安全的递增
@@ -162,22 +173,22 @@ static int decode_switches(int argc, char **argv)
         case 'f':
         {
             forks = atoi(optarg);
-			if (forks <= 0 || forks > MAXFORK) {
-				error(EXIT_FAILURE, 0, _("invalid --fork-consumers: %s range[1-%d]"),  optarg, MAXFORK);
-			}
+            if (forks <= 0 || forks > MAXFORK) {
+                error(EXIT_FAILURE, 0, _("invalid --fork-consumers: %s range[1-%d]"),  optarg, MAXFORK);
+            }
             break;
         }
-		case 'p':
-		{
-			producer = (char *)optarg;
-			break;
-		}
+        case 'p':
+        {
+            producer = (char *)optarg;
+            break;
+        }
         case 's':
         {
             step = atoi(optarg);
-			if (step <= 0 || step > MAXSTEP) {
-				error(EXIT_FAILURE, 0, _("invalid --step: %s range[1-%d]"),  optarg, MAXSTEP);
-			}
+            if (step <= 0 || step > MAXSTEP) {
+                error(EXIT_FAILURE, 0, _("invalid --step: %s range[1-%d]"),  optarg, MAXSTEP);
+            }
             break;
         }
         case 'v':
