@@ -37,7 +37,7 @@
 // 生产者
 static char *producer;
 
-// 消费才
+// 消费者
 static char *consumer;
 
 // 并发数
@@ -48,9 +48,11 @@ static int step;
 
 // 解析参数
 static int decode_switches(int argc, char **argv);
+
 // 递增
 static int increment(int val);
-//帮助
+
+// 帮助
 void usage_zh(int status);
 
 static struct option const long_options[] =
@@ -114,7 +116,7 @@ int main(int argc, char *argv[])
             j = increment(j);
         }
     }
-	// 关闭
+    // 关闭
     if (strcmp(producer, "stdin") != 0) {
         if (pclose(fpin)) {
             if (errno == 0) {
