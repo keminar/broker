@@ -4,6 +4,8 @@
 #include <limits.h>
 #include <errno.h>
 #include <string.h>
+#include <pthread.h>
+#include <sys/wait.h>
 
 // 一行最大字节
 #define MAXLINE 65535
@@ -18,7 +20,7 @@
 #define PACKAGE_NAME "broker"
 
 // 版本
-#define PACKAGE_VERSION "v0.2"
+#define PACKAGE_VERSION "v0.3"
 
 #define _(Msgid) ((const char*)Msgid)
 
@@ -46,6 +48,12 @@ static int forks;
 // 步长
 static int step;
 
+// 线程参数
+typedef struct {
+    FILE *fp;
+    int index;
+} ThreadArgs;
+
 // 解析参数
 static int decode_switches(int argc, char **argv);
 
@@ -54,6 +62,9 @@ static int increment(int val);
 
 // 帮助
 void usage_zh(int status);
+
+// 线程函数：关闭消费进程
+static void *close_consumer_thread(void *arg);
 
 static struct option const long_options[] =
 {
@@ -74,6 +85,8 @@ int main(int argc, char *argv[])
     forks = 1;
     step = 1;
     producer = "stdin";
+    pthread_t threads[MAXFORK];//线程id
+    ThreadArgs thread_args[MAXFORK];//线程参数
 
     decode_switches(argc, argv);
     if (consumer == NULL) {
@@ -96,6 +109,11 @@ int main(int argc, char *argv[])
             perror("popen consumer err");
             return 0;
         }
+	// 初始化线程参数
+	thread_args[i] = (ThreadArgs){
+            .fp = fpout[i],
+            .index = i
+	};
     }
 
     // 转发日志
@@ -120,17 +138,48 @@ int main(int argc, char *argv[])
     if (strcmp(producer, "stdin") != 0) {
         if (pclose(fpin)) {
             if (errno == 0) {
-                perror("pclose fgets err");
+                perror("pclose producer err");
             }
         }
     }
+
+    // 使用多线程并行关闭消费进程，解决在Alpine linux上卡住的问题
     for (i=0; i< forks; i++) {
-        if (pclose(fpout[i])) {
-            if (errno == 0) {
-                perror("pclose forks err");
+	if (pthread_create(&threads[i], NULL, close_consumer_thread, &thread_args[i]) != 0) {
+            perror("pthread_create err");
+	    // 线程创建失败，直接关闭,至少非Alpine系统能正常退出
+            if (pclose(fpout[i])) {
+                if (errno == 0) {
+                    perror("pclose consumer err");
+                }
             }
-        }
+            fpout[i] = NULL;
+	}
     }
+    // 等待所有线程完成
+    for (i = 0; i < forks; i++) {
+	if (fpout[i] != NULL) {
+            pthread_join(threads[i], NULL);
+	    fpout[i] = NULL;
+	}
+    }
+}
+
+// 线程函数：关闭单个消费进程
+static void *close_consumer_thread(void *arg)
+{
+    ThreadArgs *args = (ThreadArgs *)arg;
+
+    if (!args->fp) {
+        pthread_exit(NULL);
+    }
+
+    if (pclose(args->fp) == -1) {
+        if (errno != EINVAL) {
+          fprintf(stdout, "thread %d: pclose consumer error\n", args->index);
+	}
+    }
+    pthread_exit(NULL);
 }
 
 // 安全的递增
