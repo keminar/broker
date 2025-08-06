@@ -11,7 +11,7 @@ CC=gcc
 # -D_POSIX_C_SOURCE=200809L 显式指定 POSIX 标准编译
 # -Wall：开启所有警告
 # -O2：启用二级优化
-CFLAGS=-std=c11 -D_POSIX_C_SOURCE=200809L -Wall -O2
+CFLAGS=-std=c11 -D_POSIX_C_SOURCE=200809L -Wall -O2 -lpthread
 
 # 目标程序名称
 TARGET = broker
